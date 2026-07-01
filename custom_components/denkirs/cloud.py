@@ -12,13 +12,11 @@ from __future__ import annotations
 
 import asyncio
 from dataclasses import dataclass
-from typing import Any, Final
+from typing import Any
 
 import tinytuya
 
 from .api import DenkirsError
-
-_SUB_DEVICES_ENDPOINT: Final = "/v1.0/iot-03/devices/{gateway_id}/sub-devices"
 
 
 class DenkirsCloudError(DenkirsError):
@@ -69,7 +67,7 @@ class DenkirsCloud:
 
     def _discover(self) -> list[DiscoveredGateway]:
         cloud = self._connect()
-        gateways = _partition(cloud, _device_list(cloud))
+        gateways = _partition(_device_list(cloud))
         if not gateways:
             msg = "the account holds no gateway with fixtures behind it"
             raise DenkirsNoGatewaysError(msg)
@@ -94,37 +92,30 @@ def _device_list(cloud: Any) -> list[dict[str, Any]]:
     return devices
 
 
-def _partition(cloud: Any, devices: list[dict[str, Any]]) -> list[DiscoveredGateway]:
+def _partition(devices: list[dict[str, Any]]) -> list[DiscoveredGateway]:
     by_id = {dev["id"]: dev for dev in devices if "id" in dev}
     children: dict[str, list[dict[str, Any]]] = {}
     for dev in devices:
-        if dev.get("sub") and dev.get("gateway_id"):
-            children.setdefault(dev["gateway_id"], []).append(dev)
+        parent = dev.get("gateway_id")
+        if parent and dev.get("node_id"):
+            children.setdefault(parent, []).append(dev)
 
     gateways: list[DiscoveredGateway] = []
-    for dev in devices:
-        if dev.get("sub") or "id" not in dev:
+    for gateway_id, subs in children.items():
+        parent = by_id.get(gateway_id)
+        if parent is None:
             continue
-        subs = children.get(dev["id"]) or _fetch_sub_devices(cloud, dev["id"])
         fixtures = _fixtures(subs, by_id)
         if fixtures:
             gateways.append(
                 DiscoveredGateway(
-                    gateway_id=dev["id"],
-                    local_key=str(dev.get("key", "")),
-                    name=str(dev.get("name") or dev["id"]),
+                    gateway_id=gateway_id,
+                    local_key=str(parent.get("key", "")),
+                    name=str(parent.get("name") or gateway_id),
                     fixtures=fixtures,
                 )
             )
     return gateways
-
-
-def _fetch_sub_devices(cloud: Any, gateway_id: str) -> list[dict[str, Any]]:
-    response = cloud.cloudrequest(_SUB_DEVICES_ENDPOINT.format(gateway_id=gateway_id))
-    if not isinstance(response, dict) or not response.get("success"):
-        return []
-    result = response.get("result")
-    return result if isinstance(result, list) else []
 
 
 def _fixtures(
