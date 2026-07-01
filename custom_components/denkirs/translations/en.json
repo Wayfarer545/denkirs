@@ -1,0 +1,42 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Denkirs gateway",
+        "description": "Enter the connection details of the Denkirs Wi-Fi gateway.",
+        "data": {
+          "host": "Host",
+          "gateway_id": "Gateway device ID",
+          "local_key": "Local key"
+        }
+      },
+      "lamp": {
+        "title": "Add a fixture",
+        "description": "Add a track fixture that lives behind the gateway.",
+        "data": {
+          "name": "Name",
+          "device_id": "Device ID",
+          "cid": "Mesh ID (cid)",
+          "model": "Model",
+          "add_another": "Add another fixture"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Could not reach the gateway. Check the host and local key."
+    },
+    "abort": {
+      "already_configured": "This gateway is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Denkirs options",
+        "data": {
+          "scan_interval": "Polling interval (seconds)"
+        }
+      }
+    }
+  }
+}
