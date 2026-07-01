@@ -38,7 +38,7 @@ fixtures never flicker between intermediate states.
 
 ## Requirements
 
-- Home Assistant 2026.7 or newer.
+- Home Assistant 2026.6 or newer.
 - The gateway joined to the same LAN as Home Assistant.
 - The gateway's `device id` and `local key`, and each fixture's `device id` and
   mesh `cid` (see [Finding your credentials](#finding-your-credentials)).
