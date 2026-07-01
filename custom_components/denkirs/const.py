@@ -19,6 +19,31 @@ CONF_CID: Final = "cid"
 CONF_DEVICE_ID: Final = "device_id"
 CONF_MODEL: Final = "model"
 
+# Cloud-assisted setup keys.
+CONF_REGION: Final = "region"
+CONF_CLIENT_ID: Final = "client_id"
+CONF_CLIENT_SECRET: Final = "client_secret"
+CONF_PROTOCOL_VERSION: Final = "protocol_version"
+
+DEFAULT_REGION: Final = "eu"
+
+# Tuya cloud datacentre region codes mapped to human labels.
+TUYA_REGIONS: Final = {
+    "eu": "Central Europe",
+    "eu-w": "Western Europe",
+    "us": "Western America",
+    "us-e": "Eastern America",
+    "cn": "China",
+    "in": "India",
+    "sg": "Singapore",
+}
+
+# Tuya product categories that are not fixtures (battery wall switches, sensors);
+# discovered devices in these categories are left unchecked in the picker.
+NON_LIGHT_CATEGORIES: Final = frozenset(
+    {"wxkg", "kg", "cz", "pir", "mcs", "wsdcg", "rqbj", "ywbj", "sos", "sj", "ylcg"}
+)
+
 # Tuya LAN transport.
 PROTOCOL_VERSION: Final = 3.4
 TUYA_PORT: Final = 6668

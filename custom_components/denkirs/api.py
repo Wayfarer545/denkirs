@@ -28,6 +28,7 @@ from .const import (
 
 _ERROR_KEYS: Final = ("Err", "Error")
 _DEFAULT_TIMEOUT: Final = 8
+_SCAN_SECONDS: Final = 6
 
 
 class DenkirsError(Exception):
@@ -171,6 +172,31 @@ class DenkirsGateway:
         if self._parent is not None:
             self._parent.close()
             self._parent = None
+
+
+async def async_scan_gateway(gateway_id: str) -> tuple[str, float] | None:
+    """Find a gateway's LAN address and protocol version via a broadcast scan.
+
+    Tuya gateways announce themselves over UDP broadcast; the scan matches one
+    by its device id and returns its address and protocol version so the setup
+    flow never has to ask for them. Returns ``None`` when the gateway does not
+    answer within the scan window, so the caller can fall back to manual entry.
+    """
+    try:
+        found = await asyncio.to_thread(_scan)
+    except Exception:  # scanning is best-effort; fall back to manual entry
+        return None
+    info = found.get(gateway_id)
+    if not isinstance(info, Mapping) or not info.get("ip"):
+        return None
+    version = info.get("version")
+    return str(info["ip"]), (float(version) if version else PROTOCOL_VERSION)
+
+
+def _scan() -> Mapping[str, Any]:
+    """Broadcast-scan the LAN for Tuya devices, keyed by device id."""
+    result = tinytuya.deviceScan(maxretry=_SCAN_SECONDS, poll=False, byID=True)
+    return result if isinstance(result, Mapping) else {}
 
 
 def _apply(device: Any, data: dict[str, Any]) -> None:

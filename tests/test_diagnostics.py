@@ -11,10 +11,13 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 from custom_components.denkirs.api import LampState
 from custom_components.denkirs.const import (
     CONF_CID,
+    CONF_CLIENT_ID,
+    CONF_CLIENT_SECRET,
     CONF_DEVICE_ID,
     CONF_GATEWAY_ID,
     CONF_LAMPS,
     CONF_LOCAL_KEY,
+    CONF_REGION,
     DOMAIN,
 )
 from custom_components.denkirs.diagnostics import (
@@ -54,3 +57,28 @@ async def test_diagnostics_redacts_local_key(hass: HomeAssistant) -> None:
     assert diagnostics["entry"]["data"][CONF_LOCAL_KEY] == "**REDACTED**"
     assert diagnostics["entry"]["data"][CONF_HOST] == "192.168.1.10"
     assert diagnostics["fixtures"]["0018"]["brightness"] == 500
+
+
+async def test_diagnostics_redacts_client_secret(hass: HomeAssistant) -> None:
+    """Stored cloud credentials keep the client secret redacted."""
+    data = {
+        **ENTRY_DATA,
+        CONF_REGION: "eu",
+        CONF_CLIENT_ID: "cid",
+        CONF_CLIENT_SECRET: "topsecret",
+    }
+    entry = MockConfigEntry(domain=DOMAIN, data=data)
+    entry.add_to_hass(hass)
+
+    with patch("custom_components.denkirs.DenkirsGateway") as gateway_cls:
+        gateway = gateway_cls.return_value
+        gateway.gateway_id = "gwid"
+        gateway.async_poll = AsyncMock(return_value=STATE)
+        gateway.async_disconnect = AsyncMock()
+        assert await hass.config_entries.async_setup(entry.entry_id)
+        await hass.async_block_till_done()
+
+        diagnostics = await async_get_config_entry_diagnostics(hass, entry)
+
+    assert diagnostics["entry"]["data"][CONF_CLIENT_SECRET] == "**REDACTED**"
+    assert diagnostics["entry"]["data"][CONF_CLIENT_ID] == "cid"

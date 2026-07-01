@@ -7,10 +7,10 @@ from typing import Any
 from homeassistant.components.diagnostics import async_redact_data
 from homeassistant.core import HomeAssistant
 
-from .const import CONF_LOCAL_KEY
+from .const import CONF_CLIENT_SECRET, CONF_LOCAL_KEY
 from .data import DenkirsConfigEntry
 
-TO_REDACT = {CONF_LOCAL_KEY}
+TO_REDACT = {CONF_LOCAL_KEY, CONF_CLIENT_SECRET}
 
 
 async def async_get_config_entry_diagnostics(
