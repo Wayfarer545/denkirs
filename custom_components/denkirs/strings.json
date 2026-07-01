@@ -2,6 +2,44 @@
   "config": {
     "step": {
       "user": {
+        "title": "Denkirs",
+        "description": "How would you like to add your Denkirs fixtures?",
+        "menu_options": {
+          "cloud": "Automatic (Tuya cloud discovery)",
+          "manual": "Manual entry"
+        }
+      },
+      "cloud": {
+        "title": "Tuya cloud discovery",
+        "description": "Enter the credentials of your Tuya IoT project. They are used once to discover the gateway and every fixture behind it; control stays local afterwards.",
+        "data": {
+          "region": "Region",
+          "client_id": "Client ID (Access ID)",
+          "client_secret": "Client Secret (Access Secret)"
+        }
+      },
+      "gateway_select": {
+        "title": "Select the gateway",
+        "description": "More than one gateway was found. Choose the one to configure.",
+        "data": {
+          "gateway_id": "Gateway"
+        }
+      },
+      "fixtures": {
+        "title": "Select fixtures",
+        "description": "Choose the fixtures to add. Everything except battery wall switches is selected by default.",
+        "data": {
+          "lamps": "Fixtures"
+        }
+      },
+      "gateway_ip": {
+        "title": "Gateway address",
+        "description": "The gateway could not be found automatically. Enter its IP address on your network.",
+        "data": {
+          "host": "Host"
+        }
+      },
+      "manual": {
         "title": "Denkirs gateway",
         "description": "Enter the connection details of the Denkirs Wi-Fi gateway.",
         "data": {
@@ -23,10 +61,18 @@
       }
     },
     "error": {
-      "cannot_connect": "Could not reach the gateway. Check the host and local key."
+      "cannot_connect": "Could not reach the gateway. Check the host and local key.",
+      "cloud_auth": "Tuya rejected these credentials. Check the region, Client ID and Client Secret.",
+      "no_gateways": "No gateway with fixtures was found in this account.",
+      "no_fixtures": "Select at least one fixture."
     },
     "abort": {
-      "already_configured": "This gateway is already configured."
+      "already_configured": "This gateway is already configured.",
+      "reconfigure_successful": "The fixture list was refreshed from the cloud.",
+      "no_cloud_credentials": "This entry was set up manually, so there are no cloud credentials to re-sync with.",
+      "cloud_auth": "Tuya rejected the stored credentials.",
+      "no_gateways": "The gateway was not found in the account.",
+      "cannot_connect": "Could not reach the Tuya cloud."
     }
   },
   "options": {

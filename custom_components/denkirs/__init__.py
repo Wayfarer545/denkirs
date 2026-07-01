@@ -15,8 +15,10 @@ from .const import (
     CONF_LAMPS,
     CONF_LOCAL_KEY,
     CONF_MODEL,
+    CONF_PROTOCOL_VERSION,
     DEFAULT_SCAN_INTERVAL,
     PLATFORMS,
+    PROTOCOL_VERSION,
 )
 from .coordinator import DenkirsCoordinator
 from .data import DenkirsConfigEntry, DenkirsRuntimeData
@@ -30,6 +32,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: DenkirsConfigEntry) -> b
         entry.data[CONF_HOST],
         entry.data[CONF_GATEWAY_ID],
         entry.data[CONF_LOCAL_KEY],
+        version=entry.data.get(CONF_PROTOCOL_VERSION, PROTOCOL_VERSION),
     )
     scan_interval = entry.options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
     coordinator = DenkirsCoordinator(

@@ -58,20 +58,33 @@ directory and restart.
 
 ## Configuration
 
-Go to **Settings → Devices & Services → Add Integration → Denkirs**.
+Go to **Settings → Devices & Services → Add Integration → Denkirs**, then choose
+how to add your fixtures.
 
-1. **Gateway** — enter the gateway's host (IP), device id and local key.
-2. **Fixtures** — add each fixture: a friendly name, its device id, its mesh
-   `cid`, and optionally the model. Tick *Add another fixture* to keep going.
+### Automatic (recommended)
 
-Before the entry is created the integration polls the first fixture to confirm
-the host and key are correct. If it fails you are returned to the gateway step
-with your details preserved.
+Enter the credentials of a Tuya IoT project — **region**, **client id** and
+**client secret** — and Denkirs discovers the gateway and every fixture behind
+it, reads their keys and mesh ids, finds the gateway on your network and lets
+you tick which fixtures to add. If several gateways are found you pick one; if
+the gateway is not found automatically you are asked for its IP address. The
+credentials are stored so the fixture list can be re-synced later; runtime
+control never touches the cloud.
 
-### Options
+### Manual
 
-**Configure** on the integration lets you change the polling interval
-(5–600 seconds, default 30).
+Enter the gateway host, device id and local key, then add each fixture by its
+device id and mesh `cid`. Useful for air-gapped provisioning or when no cloud
+project is available.
+
+Either way, the integration polls the first fixture before creating the entry
+to confirm the connection.
+
+### Options and re-sync
+
+**Configure** on the integration changes the polling interval (5–600 seconds,
+default 30). **Reconfigure** re-runs cloud discovery and refreshes the fixture
+list, so fixtures added later can be pulled in with a couple of clicks.
 
 ## Entities
 
@@ -85,12 +98,14 @@ Each fixture becomes one `light` entity supporting:
 
 ## Finding your credentials
 
-Local keys are issued by Tuya. The usual one-time route is the free
-[Tuya IoT Platform](https://iot.tuya.com) with the
-[`tinytuya` wizard](https://github.com/jasonacox/tinytuya#setup-wizard), which
-lists every device with its `device id`, `local key` and, for fixtures behind a
-gateway, the mesh `cid`. This is only needed once during setup; the gateway does
-not use the cloud afterwards.
+Both setup paths use a free [Tuya IoT Platform](https://iot.tuya.com) project
+linked to the app account that owns the gateway. Automatic setup needs only the
+project's **region**, **access id** (client id) and **access secret** (client
+secret) — Denkirs reads every device id, local key and mesh `cid` for you.
+Manual setup instead uses the
+[`tinytuya` wizard](https://github.com/jasonacox/tinytuya#setup-wizard) to list
+those values. Either way the cloud is only touched during setup; the gateway
+does not use it afterwards.
 
 ## Running without internet
 
