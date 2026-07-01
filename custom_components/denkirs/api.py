@@ -88,6 +88,11 @@ class DenkirsGateway:
         self._lamps: dict[str, Any] = {}
         self._lock = asyncio.Lock()
 
+    @property
+    def gateway_id(self) -> str:
+        """Return the Tuya device id of the gateway."""
+        return self._gateway_id
+
     async def async_poll(self, address: LampAddress) -> LampState:
         """Return the current state of a fixture."""
         return await self._run(address, self._read_state)

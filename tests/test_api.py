@@ -134,3 +134,8 @@ async def test_transport_exception_becomes_connection_error(
     tuya_device.status.side_effect = OSError("socket closed")
     with pytest.raises(DenkirsConnectionError):
         await _gateway().async_poll(LAMP)
+
+
+def test_gateway_exposes_its_id() -> None:
+    """The gateway id is available for device metadata."""
+    assert _gateway().gateway_id == "gwid"
