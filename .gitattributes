@@ -1,0 +1,17 @@
+# Normalise line endings to LF across every platform.
+* text=auto eol=lf
+
+# Explicit text handling for source and config.
+*.py    text eol=lf
+*.json  text eol=lf
+*.toml  text eol=lf
+*.yml   text eol=lf
+*.yaml  text eol=lf
+*.md    text eol=lf
+*.txt   text eol=lf
+*.svg   text eol=lf
+
+# Binary assets must never be touched.
+*.png   binary
+*.jpg   binary
+*.ico   binary

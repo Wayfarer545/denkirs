@@ -1,0 +1,4 @@
+pytest-homeassistant-custom-component==0.13.343
+tinytuya==1.19.0
+ruff==0.14.5
+mypy==1.18.2
