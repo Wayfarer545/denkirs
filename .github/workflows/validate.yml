@@ -25,6 +25,5 @@ jobs:
           category: integration
           # These checks only gate inclusion in the HACS default store; the
           # integration installs fine as a custom repository without them.
-          # - brands: submit the logo to home-assistant/brands (see README)
-          # - description/topics: set on the GitHub repository
-          ignore: brands description topics
+          # Set the repository description and topics on GitHub to satisfy them.
+          ignore: description topics
