@@ -14,7 +14,14 @@ from custom_components.denkirs.cloud import (
     DenkirsNoGatewaysError,
 )
 
-GATEWAY_DEV = {"id": "gwid", "name": "Hub", "key": "localkey", "sub": False}
+GATEWAY_DEV = {
+    "id": "gwid",
+    "name": "Hub",
+    "key": "localkey",
+    "sub": True,
+    "gateway_id": "",
+    "category": "wg2",
+}
 LAMP_A = {
     "id": "dev-1",
     "name": "Kitchen",
@@ -104,19 +111,18 @@ async def test_discover_skips_fixture_without_node_id() -> None:
     assert [f.cid for f in gateways[0].fixtures] == ["0018"]
 
 
-async def test_discover_falls_back_to_sub_devices_endpoint() -> None:
-    """When the list lacks children, the sub-devices endpoint is queried."""
-    client = _cloud_client(devices=[GATEWAY_DEV])
-    client.cloudrequest.return_value = {
-        "success": True,
-        "result": [
-            {"id": "dev-1", "name": "Kitchen", "node_id": "0018", "product_id": "pid"}
-        ],
+async def test_discover_resolves_model_from_product_id() -> None:
+    """A fixture without a product name falls back to its product id."""
+    lamp = {
+        "id": "dev-9",
+        "name": "Desk",
+        "sub": True,
+        "gateway_id": "gwid",
+        "node_id": "00e0",
+        "product_id": "pid",
     }
-    gateways = await _discover(client)
-    assert gateways[0].fixtures[0].cid == "0018"
+    gateways = await _discover(_cloud_client(devices=[GATEWAY_DEV, lamp]))
     assert gateways[0].fixtures[0].model == "pid"
-    client.cloudrequest.assert_called_once()
 
 
 async def test_discover_raises_auth_error_when_token_missing() -> None:
@@ -142,12 +148,18 @@ async def test_discover_raises_when_device_list_is_an_error() -> None:
         await _discover(_cloud_client(devices={"Error": "nope"}))
 
 
-async def test_discover_raises_when_no_gateways() -> None:
-    """An account with no gateway holding fixtures raises."""
-    client = _cloud_client(devices=[{"id": "x", "sub": False}])
-    client.cloudrequest.return_value = {"success": False}
+async def test_discover_raises_when_gateway_absent_from_account() -> None:
+    """A fixture whose parent gateway is missing from the list raises."""
+    orphan = {"id": "dev-1", "sub": True, "gateway_id": "ghost", "node_id": "0018"}
     with pytest.raises(DenkirsNoGatewaysError):
-        await _discover(client)
+        await _discover(_cloud_client(devices=[orphan]))
+
+
+async def test_discover_ignores_gateway_without_valid_fixtures() -> None:
+    """A gateway whose only child lacks a device id yields no fixtures."""
+    child = {"sub": True, "gateway_id": "gwid", "node_id": "0018"}
+    with pytest.raises(DenkirsNoGatewaysError):
+        await _discover(_cloud_client(devices=[GATEWAY_DEV, child]))
 
 
 def _patch_scan(result: object) -> object:
