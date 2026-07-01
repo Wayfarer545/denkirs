@@ -6,6 +6,7 @@ from collections.abc import Iterator
 from unittest.mock import MagicMock, patch
 
 import pytest
+
 from custom_components.denkirs.api import (
     DenkirsConnectionError,
     DenkirsGateway,
