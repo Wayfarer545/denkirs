@@ -92,17 +92,29 @@ class DenkirsGateway:
         """Return the current state of a fixture."""
         return await self._run(address, self._read_state)
 
-    async def async_set_power(self, address: LampAddress, *, on: bool) -> None:
-        """Switch a fixture on or off."""
-        await self._command(address, {DP_POWER: on})
+    async def async_apply(
+        self,
+        address: LampAddress,
+        *,
+        power: bool | None = None,
+        brightness: int | None = None,
+        color_temp: int | None = None,
+    ) -> None:
+        """Apply any combination of settings in a single atomic write.
 
-    async def async_set_brightness(self, address: LampAddress, native: int) -> None:
-        """Set fixture brightness on the device's native scale."""
-        await self._command(address, {DP_BRIGHTNESS: native})
-
-    async def async_set_color_temp(self, address: LampAddress, native: int) -> None:
-        """Set fixture colour temperature on the device's native scale."""
-        await self._command(address, {DP_COLOR_TEMP: native})
+        Brightness and colour temperature are expressed on the device's native
+        scale. Passing several settings at once writes them together so the
+        fixture never flickers between intermediate states.
+        """
+        data: dict[str, Any] = {}
+        if power is not None:
+            data[DP_POWER] = power
+        if brightness is not None:
+            data[DP_BRIGHTNESS] = brightness
+        if color_temp is not None:
+            data[DP_COLOR_TEMP] = color_temp
+        if data:
+            await self._command(address, data)
 
     async def async_disconnect(self) -> None:
         """Close every socket opened by this client."""

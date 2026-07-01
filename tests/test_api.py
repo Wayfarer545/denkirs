@@ -64,29 +64,43 @@ async def test_poll_raises_when_payload_malformed(tuya_device: MagicMock) -> Non
         await _gateway().async_poll(LAMP)
 
 
-async def test_set_power_sends_switch_datapoint(tuya_device: MagicMock) -> None:
-    """Turning on writes the boolean switch datapoint."""
-    await _gateway().async_set_power(LAMP, on=True)
+async def test_apply_power_only_writes_switch(tuya_device: MagicMock) -> None:
+    """Applying power alone writes just the boolean switch datapoint."""
+    await _gateway().async_apply(LAMP, power=True)
     tuya_device.set_multiple_values.assert_called_once_with({"1": True})
 
 
-async def test_set_brightness_sends_native_scale(tuya_device: MagicMock) -> None:
+async def test_apply_writes_native_brightness(tuya_device: MagicMock) -> None:
     """Brightness is written on the device's native scale."""
-    await _gateway().async_set_brightness(LAMP, 750)
+    await _gateway().async_apply(LAMP, brightness=750)
     tuya_device.set_multiple_values.assert_called_once_with({"3": 750})
 
 
-async def test_set_color_temp_sends_native_scale(tuya_device: MagicMock) -> None:
+async def test_apply_writes_native_color_temp(tuya_device: MagicMock) -> None:
     """Colour temperature is written on the device's native scale."""
-    await _gateway().async_set_color_temp(LAMP, 250)
+    await _gateway().async_apply(LAMP, color_temp=250)
     tuya_device.set_multiple_values.assert_called_once_with({"4": 250})
+
+
+async def test_apply_combines_settings_in_one_write(tuya_device: MagicMock) -> None:
+    """Several settings are written together as a single command."""
+    await _gateway().async_apply(LAMP, power=True, brightness=500, color_temp=100)
+    tuya_device.set_multiple_values.assert_called_once_with(
+        {"1": True, "3": 500, "4": 100}
+    )
+
+
+async def test_apply_without_settings_is_a_noop(tuya_device: MagicMock) -> None:
+    """Applying nothing touches neither the socket nor the device."""
+    await _gateway().async_apply(LAMP)
+    tuya_device.set_multiple_values.assert_not_called()
 
 
 async def test_command_raises_on_protocol_error(tuya_device: MagicMock) -> None:
     """A failed write surfaces as a connection error."""
     tuya_device.set_multiple_values.return_value = {"Err": "905"}
     with pytest.raises(DenkirsConnectionError):
-        await _gateway().async_set_power(LAMP, on=True)
+        await _gateway().async_apply(LAMP, power=True)
 
 
 async def test_sub_device_created_once_per_lamp(tuya_device: MagicMock) -> None:
