@@ -1,0 +1,12 @@
+{
+  "domain": "denkirs",
+  "name": "Denkirs",
+  "codeowners": ["@Wayfarer545"],
+  "config_flow": true,
+  "documentation": "https://github.com/Wayfarer545/denkirs",
+  "integration_type": "hub",
+  "iot_class": "local_polling",
+  "issue_tracker": "https://github.com/Wayfarer545/denkirs/issues",
+  "requirements": ["tinytuya==1.19.0"],
+  "version": "0.1.0"
+}
