@@ -122,10 +122,10 @@ harness; no hardware is required.
 
 ## Branding
 
-The HACS/Home Assistant logo is served from the
+The Denkirs icon ships with the integration under `custom_components/denkirs/brand/`.
+Home Assistant serves it directly — local brand images take priority over the
+brands CDN since 2026.3 — so it appears in the UI with no submission to the
 [home-assistant/brands](https://github.com/home-assistant/brands) repository.
-Submit the Denkirs icon and logo there under the `denkirs` domain to have them
-appear in the UI.
 
 ## License
 
