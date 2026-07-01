@@ -32,8 +32,9 @@ select = [
     "W",     # pycodestyle warnings
 ]
 ignore = [
-    "D203", # conflicts with D211
-    "D213", # conflicts with D212
+    "D203",   # conflicts with D211
+    "D213",   # conflicts with D212
+    "RUF012", # HA entities use plain mutable _attr_ class defaults by design
 ]
 
 [tool.ruff.lint.pydocstyle]
@@ -55,6 +56,10 @@ enable_error_code = ["ignore-without-code", "redundant-self", "truthy-iterable"]
 [[tool.mypy.overrides]]
 module = "tinytuya.*"
 ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "homeassistant.*"
+implicit_reexport = true
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
